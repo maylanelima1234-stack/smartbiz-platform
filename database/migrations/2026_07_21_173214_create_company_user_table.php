@@ -20,10 +20,6 @@ return new class extends Migration
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            $table->foreignId('role_id')
-                ->nullable()
-                ->constrained('roles')
-                ->nullOnDelete();
 
             $table->string('status', 20)->default('active');
             $table->timestamp('joined_at')->nullable();
@@ -49,7 +45,6 @@ return new class extends Migration
 
             $table->index(['company_id', 'status']);
             $table->index(['user_id', 'status']);
-            $table->index(['company_id', 'role_id']);
         });
     }
 
