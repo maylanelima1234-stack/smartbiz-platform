@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\CRM\Http\Requests;
+namespace App\Domain\CRM\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,3 +25,4 @@ class StoreLeadRequest extends FormRequest
         ];
     }
 }
+

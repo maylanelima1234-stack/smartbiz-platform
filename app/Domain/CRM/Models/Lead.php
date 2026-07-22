@@ -39,3 +39,4 @@ class Lead extends Model
     public function owner(): BelongsTo { return $this->belongsTo(User::class, 'owner_id'); }
     public function activities(): HasMany { return $this->hasMany(CrmActivity::class)->latest(); }
 }
+

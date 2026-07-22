@@ -58,3 +58,4 @@ class SmartGateTest extends TestCase
         $gate->authorize('users.delete');
     }
 }
+

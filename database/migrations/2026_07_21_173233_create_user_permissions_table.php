@@ -25,13 +25,13 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             /*
-             * true: concede a permissão.
-             * false: remove a permissão herdada do papel.
+             * true: concede a permissÃ£o.
+             * false: remove a permissÃ£o herdada do papel.
              */
             $table->boolean('allowed')->default(true);
 
             /*
-             * Permite delegações temporárias.
+             * Permite delegaÃ§Ãµes temporÃ¡rias.
              */
             $table->timestamp('starts_at')->nullable();
             $table->timestamp('expires_at')->nullable();

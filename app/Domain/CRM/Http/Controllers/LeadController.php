@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modules\CRM\Http\Controllers;
+namespace App\Domain\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRM\Http\Requests\StoreLeadRequest;
-use App\Modules\CRM\Http\Requests\UpdateLeadRequest;
-use App\Modules\CRM\Models\CrmStage;
-use App\Modules\CRM\Models\Lead;
-use App\Modules\CRM\Services\LeadService;
+use App\Domain\CRM\Http\Requests\StoreLeadRequest;
+use App\Domain\CRM\Http\Requests\UpdateLeadRequest;
+use App\Domain\CRM\Models\CrmStage;
+use App\Domain\CRM\Models\Lead;
+use App\Domain\CRM\Services\LeadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -61,3 +61,4 @@ class LeadController extends Controller
         return response()->json(status: 204);
     }
 }
+

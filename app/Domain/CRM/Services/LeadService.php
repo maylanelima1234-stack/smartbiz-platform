@@ -4,8 +4,8 @@ namespace App\Domain\CRM\Services;
 
 use App\Core\Audit\Facades\SmartAudit;
 use App\Core\Context\PlatformContext;
-use App\Modules\CRM\Models\CrmStage;
-use App\Modules\CRM\Models\Lead;
+use App\Domain\CRM\Models\CrmStage;
+use App\Domain\CRM\Models\Lead;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 
@@ -106,3 +106,4 @@ class LeadService
         );
     }
 }
+

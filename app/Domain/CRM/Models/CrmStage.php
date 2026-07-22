@@ -38,3 +38,4 @@ class CrmStage extends Model
         return $this->hasMany(Lead::class, 'stage_id');
     }
 }
+

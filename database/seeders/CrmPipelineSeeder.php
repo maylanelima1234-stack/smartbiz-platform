@@ -13,7 +13,7 @@ class CrmPipelineSeeder extends Seeder
         $pipeline = CrmPipeline::firstOrCreate(
             ['name' => 'Pipeline Comercial SmartBiz'],
             [
-                'description' => 'Funil padrão para diagnóstico, proposta e fechamento.',
+                'description' => 'Funil padrÃ£o para diagnÃ³stico, proposta e fechamento.',
                 'status' => 'Ativo',
             ]
         );
@@ -21,7 +21,7 @@ class CrmPipelineSeeder extends Seeder
         $stages = [
             ['name' => 'Novo', 'position' => 1, 'color' => '#6D28D9'],
             ['name' => 'Contato', 'position' => 2, 'color' => '#8B5CF6'],
-            ['name' => 'Diagnóstico', 'position' => 3, 'color' => '#F59E0B'],
+            ['name' => 'DiagnÃ³stico', 'position' => 3, 'color' => '#F59E0B'],
             ['name' => 'Proposta', 'position' => 4, 'color' => '#22C55E'],
             ['name' => 'Fechado', 'position' => 5, 'color' => '#16A34A'],
         ];

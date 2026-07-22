@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\CRM\Http\Requests;
+namespace App\Domain\CRM\Http\Requests;
 
 class UpdateLeadRequest extends StoreLeadRequest
 {
@@ -11,3 +11,4 @@ class UpdateLeadRequest extends StoreLeadRequest
         return $rules;
     }
 }
+

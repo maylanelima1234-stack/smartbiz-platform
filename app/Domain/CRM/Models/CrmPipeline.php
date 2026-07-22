@@ -32,3 +32,4 @@ class CrmPipeline extends Model
         return $this->hasMany(Lead::class, 'pipeline_id');
     }
 }
+

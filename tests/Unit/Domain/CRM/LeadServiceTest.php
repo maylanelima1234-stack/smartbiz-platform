@@ -23,3 +23,4 @@ class LeadServiceTest extends TestCase
         $this->assertInstanceOf(LeadService::class, $service);
     }
 }
+

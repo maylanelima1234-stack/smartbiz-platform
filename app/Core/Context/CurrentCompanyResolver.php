@@ -16,7 +16,10 @@ class CurrentCompanyResolver implements CurrentCompanyResolverContract
     {
         $activeCompanyId = session(self::SESSION_KEY);
 
-        if ($activeCompanyId !== null && $this->hasActiveMembership($user, (int) $activeCompanyId)) {
+        if (
+            $activeCompanyId !== null
+            && $this->hasActiveMembership($user, (int) $activeCompanyId)
+        ) {
             return Company::query()->find($activeCompanyId);
         }
 
@@ -33,20 +36,30 @@ class CurrentCompanyResolver implements CurrentCompanyResolverContract
             return null;
         }
 
-        session([self::SESSION_KEY => (int) $firstCompanyId]);
+        session([
+            self::SESSION_KEY => (int) $firstCompanyId,
+        ]);
 
         return Company::query()->find($firstCompanyId);
     }
 
     public function switch(User $user, Company $company): void
     {
-        if (! $this->hasActiveMembership($user, (int) $company->getKey())) {
+        if (
+            ! $this->hasActiveMembership(
+                $user,
+                (int) $company->getKey()
+            )
+        ) {
             throw ValidationException::withMessages([
                 'company' => 'Você não possui acesso ativo a esta empresa.',
             ]);
         }
 
-        session([self::SESSION_KEY => (int) $company->getKey()]);
+        session([
+            self::SESSION_KEY => (int) $company->getKey(),
+        ]);
+
         session()->regenerate();
     }
 
@@ -55,8 +68,10 @@ class CurrentCompanyResolver implements CurrentCompanyResolverContract
         session()->forget(self::SESSION_KEY);
     }
 
-    private function hasActiveMembership(User $user, int $companyId): bool
-    {
+    private function hasActiveMembership(
+        User $user,
+        int $companyId
+    ): bool {
         return DB::table('company_user')
             ->where('user_id', $user->getKey())
             ->where('company_id', $companyId)

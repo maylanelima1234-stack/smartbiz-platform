@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Company;
-use App\Modules\CRM\Models\CrmPipeline;
-use App\Modules\CRM\Models\CrmStage;
+use App\Domain\CRM\Models\CrmPipeline;
+use App\Domain\CRM\Models\CrmStage;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -18,7 +18,7 @@ class CrmEnterpriseSeeder extends Seeder
                 [
                     'public_id' => (string) Str::ulid(),
                     'name' => 'Pipeline de Vendas',
-                    'description' => 'Pipeline padrão do CRM',
+                    'description' => 'Pipeline padrÃ£o do CRM',
                     'is_default' => true,
                     'status' => 'active',
                 ]
@@ -44,3 +44,4 @@ class CrmEnterpriseSeeder extends Seeder
         });
     }
 }
+

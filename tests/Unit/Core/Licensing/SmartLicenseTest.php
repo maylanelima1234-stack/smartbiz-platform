@@ -55,3 +55,4 @@ class SmartLicenseTest extends TestCase
         $this->assertSame(2, $license->remaining('users', 3));
     }
 }
+

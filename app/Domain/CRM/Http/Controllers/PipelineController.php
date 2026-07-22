@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\CRM\Http\Controllers;
+namespace App\Domain\CRM\Http\Controllers;
 
 use App\Core\Context\PlatformContext;
 use App\Http\Controllers\Controller;
-use App\Modules\CRM\Models\CrmPipeline;
+use App\Domain\CRM\Models\CrmPipeline;
 use Illuminate\Http\JsonResponse;
 
 class PipelineController extends Controller
@@ -24,3 +24,4 @@ class PipelineController extends Controller
         );
     }
 }
+
