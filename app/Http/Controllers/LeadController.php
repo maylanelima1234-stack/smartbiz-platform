@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\CRM\Models\CrmPipeline;
+use App\Domain\CRM\Models\CrmStage;
+use App\Domain\CRM\Models\Lead;
 use App\Models\Company;
-use App\Models\CrmPipeline;
-use App\Models\CrmStage;
-use App\Models\Lead;
 use App\Models\SmartNotification;
 use App\Models\User;
 use Illuminate\Http\Request;

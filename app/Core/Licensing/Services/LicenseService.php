@@ -30,7 +30,9 @@ class LicenseService
         return Cache::remember(
             $this->cacheKey((int) $company->getKey()),
             now()->addSeconds($this->cacheTtl()),
-            fn (): string => $this->repository->planFor($company)
+            fn (): string => strtolower(
+                trim($this->repository->planFor($company))
+            )
         );
     }
 
@@ -40,7 +42,10 @@ class LicenseService
 
         return in_array(
             $feature,
-            (array) config("licensing.plans.{$this->plan()}.features", []),
+            (array) config(
+                "licensing.plans.{$this->plan()}.features",
+                []
+            ),
             true
         );
     }
@@ -53,7 +58,10 @@ class LicenseService
     public function limit(string|BackedEnum $limit): ?int
     {
         $value = Arr::get(
-            config("licensing.plans.{$this->plan()}.limits", []),
+            config(
+                "licensing.plans.{$this->plan()}.limits",
+                []
+            ),
             $this->normalize($limit)
         );
 
@@ -64,19 +72,27 @@ class LicenseService
         return (int) $value;
     }
 
-    public function remaining(string|BackedEnum $limit, int $used): ?int
-    {
+    public function remaining(
+        string|BackedEnum $limit,
+        int $used
+    ): ?int {
         $maximum = $this->limit($limit);
 
         if ($maximum === null) {
             return null;
         }
 
-        return max(0, $maximum - max(0, $used));
+        return max(
+            0,
+            $maximum - max(0, $used)
+        );
     }
 
-    public function withinLimit(string|BackedEnum $limit, int $used, int $increment = 1): bool
-    {
+    public function withinLimit(
+        string|BackedEnum $limit,
+        int $used,
+        int $increment = 1
+    ): bool {
         $maximum = $this->limit($limit);
 
         if ($maximum === null) {
@@ -91,15 +107,19 @@ class LicenseService
         $companyId ??= $this->context->companyId();
 
         if ($companyId !== null) {
-            Cache::forget($this->cacheKey((int) $companyId));
+            Cache::forget(
+                $this->cacheKey((int) $companyId)
+            );
         }
     }
 
     private function normalize(string|BackedEnum $value): string
     {
-        return $value instanceof BackedEnum
+        $normalized = $value instanceof BackedEnum
             ? (string) $value->value
             : $value;
+
+        return strtolower(trim($normalized));
     }
 
     private function cacheKey(int $companyId): string
@@ -109,6 +129,12 @@ class LicenseService
 
     private function cacheTtl(): int
     {
-        return max(1, (int) config('licensing.cache_ttl_seconds', 300));
+        return max(
+            1,
+            (int) config(
+                'licensing.cache_ttl_seconds',
+                300
+            )
+        );
     }
 }

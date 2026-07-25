@@ -6,7 +6,7 @@
             subtitle="Acompanhe seu funil, receita e oportunidades em uma visão executiva."
         >
             <x-slot:actions>
-                <a href="{{ route('crm.leads.index') }}"
+                <a href="{{ route('leads.index') }}"
                    class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
                     Ver leads
                 </a>
@@ -109,7 +109,7 @@
                             <span class="text-xl text-slate-300 transition group-hover:translate-x-1 group-hover:text-indigo-600">→</span>
                         </a>
 
-                        <a href="{{ route('crm.leads.index') }}" class="group flex items-center justify-between rounded-xl border border-slate-200 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50">
+                        <a href="{{ route('leads.index') }}" class="group flex items-center justify-between rounded-xl border border-slate-200 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50">
                             <div>
                                 <p class="font-semibold text-slate-900">Consultar leads</p>
                                 <p class="text-sm text-slate-500">Pesquisar e revisar oportunidades</p>
@@ -122,11 +122,11 @@
 
             <x-smart.panel title="Leads recentes" subtitle="Últimas oportunidades adicionadas" :padded="false">
                 <x-slot:actions>
-                    <a href="{{ route('crm.leads.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Ver todos</a>
+                    <a href="{{ route('leads.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Ver todos</a>
                 </x-slot:actions>
 
                 @forelse ($recent_leads as $lead)
-                    <a href="{{ route('crm.leads.show', $lead) }}"
+                    <a href="{{ route('leads.show', $lead) }}"
                        class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 transition last:border-b-0 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex min-w-0 items-center gap-3">
                             <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-indigo-50 font-bold text-indigo-700">

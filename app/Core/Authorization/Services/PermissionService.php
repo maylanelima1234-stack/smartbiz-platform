@@ -23,13 +23,23 @@ class PermissionService
             return false;
         }
 
-        if ($this->roles()->intersect(
-            config('authorization.super_roles', ['super_admin'])
-        )->isNotEmpty()) {
+        if (
+            $this->roles()
+                ->intersect(
+                    config(
+                        'authorization.super_roles',
+                        ['super_admin']
+                    )
+                )
+                ->isNotEmpty()
+        ) {
             return true;
         }
 
-        return $this->permissions()->contains($this->normalize($permission));
+        return $this->permissions()
+            ->contains(
+                $this->normalize($permission)
+            );
     }
 
     public function denies(string|BackedEnum $permission): bool
@@ -46,38 +56,57 @@ class PermissionService
     {
         [$userId, $companyId] = $this->contextIds();
 
-        return Cache::remember(
+        $roles = Cache::remember(
             "smart-auth:v1:roles:company:{$companyId}:user:{$userId}",
             now()->addSeconds($this->cacheTtl()),
-            fn (): Collection => $this->repository->rolesFor($userId, $companyId)
+            fn (): array => $this->repository
+                ->rolesFor($userId, $companyId)
+                ->values()
+                ->all()
         );
+
+        return collect($roles);
     }
 
     public function permissions(): Collection
     {
         [$userId, $companyId] = $this->contextIds();
 
-        return Cache::remember(
+        $permissions = Cache::remember(
             "smart-auth:v1:permissions:company:{$companyId}:user:{$userId}",
             now()->addSeconds($this->cacheTtl()),
-            fn (): Collection => $this->repository->permissionsFor($userId, $companyId)
+            fn (): array => $this->repository
+                ->permissionsFor($userId, $companyId)
+                ->values()
+                ->all()
         );
+
+        return collect($permissions);
     }
 
-    public function flush(?int $userId = null, ?int $companyId = null): void
-    {
+    public function flush(
+        ?int $userId = null,
+        ?int $companyId = null
+    ): void {
         if ($userId === null || $companyId === null) {
             [$userId, $companyId] = $this->contextIds();
         }
 
-        Cache::forget("smart-auth:v1:roles:company:{$companyId}:user:{$userId}");
-        Cache::forget("smart-auth:v1:permissions:company:{$companyId}:user:{$userId}");
+        Cache::forget(
+            "smart-auth:v1:roles:company:{$companyId}:user:{$userId}"
+        );
+
+        Cache::forget(
+            "smart-auth:v1:permissions:company:{$companyId}:user:{$userId}"
+        );
     }
 
     private function contextIds(): array
     {
         try {
-            $userId = (int) $this->context->user()->getKey();
+            $userId = (int) $this->context
+                ->user()
+                ->getKey();
         } catch (LogicException) {
             throw new LogicException(
                 'Não é possível verificar permissões antes de inicializar o PlatformContext.'
@@ -92,11 +121,15 @@ class PermissionService
             );
         }
 
-        return [$userId, (int) $companyId];
+        return [
+            $userId,
+            (int) $companyId,
+        ];
     }
 
-    private function normalize(string|BackedEnum $permission): string
-    {
+    private function normalize(
+        string|BackedEnum $permission
+    ): string {
         return $permission instanceof BackedEnum
             ? (string) $permission->value
             : $permission;
@@ -104,6 +137,12 @@ class PermissionService
 
     private function cacheTtl(): int
     {
-        return max(1, (int) config('authorization.cache_ttl_seconds', 300));
+        return max(
+            1,
+            (int) config(
+                'authorization.cache_ttl_seconds',
+                300
+            )
+        );
     }
 }
