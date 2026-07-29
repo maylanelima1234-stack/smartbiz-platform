@@ -64,7 +64,7 @@ class GlobalSearchController extends Controller
                     'label' => $lead->name,
                     'description' => $companyName ?: ($lead->email ?: 'Lead do CRM'),
                     'initial' => 'L',
-                    'url' => route('leads.show', $lead),
+                    'url' => route('crm.leads.show', $lead),
                 ]);
             });
 

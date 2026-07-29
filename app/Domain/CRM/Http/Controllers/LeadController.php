@@ -2,24 +2,30 @@
 
 namespace App\Domain\CRM\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Domain\CRM\Http\Requests\StoreLeadRequest;
 use App\Domain\CRM\Http\Requests\UpdateLeadRequest;
 use App\Domain\CRM\Models\CrmStage;
 use App\Domain\CRM\Models\Lead;
 use App\Domain\CRM\Services\LeadService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LeadController extends Controller
 {
-    public function __construct(private readonly LeadService $service) {}
+    public function __construct(
+        private readonly LeadService $service
+    ) {
+    }
 
     public function index(Request $request): JsonResponse
     {
         return response()->json(
             $this->service->paginate($request->only([
-                'search', 'stage_id', 'owner_id', 'per_page',
+                'search',
+                'stage_id',
+                'owner_id',
+                'per_page',
             ]))
         );
     }
@@ -48,17 +54,22 @@ class LeadController extends Controller
 
     public function move(Request $request, Lead $lead): JsonResponse
     {
-        $data = $request->validate(['stage_id' => ['required', 'exists:crm_stages,id']]);
+        $data = $request->validate([
+            'stage_id' => ['required', 'exists:crm_stages,id'],
+        ]);
 
         return response()->json(
-            $this->service->move($lead, CrmStage::query()->findOrFail($data['stage_id']))
+            $this->service->move(
+                $lead,
+                CrmStage::query()->findOrFail($data['stage_id'])
+            )
         );
     }
 
     public function destroy(Lead $lead): JsonResponse
     {
         $this->service->delete($lead);
+
         return response()->json(status: 204);
     }
 }
-

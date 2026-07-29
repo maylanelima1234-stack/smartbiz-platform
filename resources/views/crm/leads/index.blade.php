@@ -1,15 +1,28 @@
-<x-app-layout>
-<x-slot name="header"><div class="flex items-center justify-between"><div><h2 class="text-xl font-semibold text-gray-800">Leads</h2><p class="text-sm text-gray-500">Pesquisa e filtros comerciais</p></div><div class="flex gap-2"><a href="{{ route('leads.create') }}" class="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white">Novo lead</a><a href="{{ route('crm.kanban') }}" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700">Kanban</a></div></div></x-slot>
-<div class="py-8"><div class="mx-auto max-w-7xl space-y-5 px-4 sm:px-6 lg:px-8">
-<form method="GET" class="grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-200 md:grid-cols-6">
-<input name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Nome, e-mail ou telefone" class="rounded-lg border-gray-300 text-sm md:col-span-2">
-<select name="status" class="rounded-lg border-gray-300 text-sm"><option value="">Todos os status</option>@foreach(['open'=>'Aberto','won'=>'Ganho','lost'=>'Perdido'] as $v=>$l)<option value="{{ $v }}" @selected(($filters['status']??'')===$v)>{{ $l }}</option>@endforeach</select>
-<select name="priority" class="rounded-lg border-gray-300 text-sm"><option value="">Prioridade</option>@foreach(['low'=>'Baixa','normal'=>'Normal','high'=>'Alta','urgent'=>'Urgente'] as $v=>$l)<option value="{{ $v }}" @selected(($filters['priority']??'')===$v)>{{ $l }}</option>@endforeach</select>
-<select name="source" class="rounded-lg border-gray-300 text-sm"><option value="">Origem</option>@foreach($sources as $source)<option value="{{ $source }}" @selected(($filters['source']??'')===$source)>{{ $source }}</option>@endforeach</select>
-<div class="flex gap-2"><button class="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white">Filtrar</button><a href="{{ route('leads.index') }}" class="rounded-lg border px-3 py-2 text-sm">Limpar</a></div>
-<label class="flex items-center gap-2 text-sm md:col-span-6"><input type="checkbox" name="favorite" value="1" @checked(($filters['favorite']??'')==='1')> Somente favoritos</label>
+@extends('layouts.smartbiz')
+
+@section('title', 'CRM — Leads')
+
+@push('styles')
+    @include('crm.partials.theme')
+@endpush
+
+@section('content')
+<div class="crm-shell crm-page"><div class="crm-container space-y-4">
+<div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><div class="crm-muted text-xs font-bold uppercase tracking-[.16em]">CRM</div><h1 class="crm-title mt-1">Leads</h1><p class="crm-subtitle">Gerencie oportunidades, prioridades e responsáveis.</p></div><a href="{{ route('crm.leads.create') }}" class="crm-btn crm-btn-primary">+ Novo lead</a></div>
+@include('crm.partials.nav')
+<form method="GET" class="crm-card grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-[2fr_repeat(6,1fr)_auto]">
+<input class="crm-input" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Buscar por nome, e-mail ou telefone">
+<select class="crm-select" name="status"><option value="">Todos os status</option>@foreach(['open'=>'Aberto','won'=>'Ganho','lost'=>'Perdido'] as $v=>$l)<option value="{{ $v }}" @selected(($filters['status']??'')===$v)>{{ $l }}</option>@endforeach</select>
+<select class="crm-select" name="priority"><option value="">Prioridade</option>@foreach(['low'=>'Baixa','normal'=>'Média','high'=>'Alta'] as $v=>$l)<option value="{{ $v }}" @selected(($filters['priority']??'')===$v)>{{ $l }}</option>@endforeach</select>
+<select class="crm-select" name="source"><option value="">Todas as origens</option>@foreach($sources as $source)<option value="{{ $source }}" @selected(($filters['source']??'')===$source)>{{ $source }}</option>@endforeach</select>
+<select class="crm-select" name="favorite"><option value="">Todos</option><option value="1" @selected(($filters['favorite']??'')==='1')>Favoritos</option></select>
+<select class="crm-select" name="owner"><option value="">Todos os responsáveis</option>@foreach($owners as $owner)<option value="{{ $owner->id }}" @selected((string)($filters['owner']??'')===(string)$owner->id)>{{ $owner->name }}</option>@endforeach</select>
+<select class="crm-select" name="mine"><option value="">Carteira completa</option><option value="1" @selected(($filters['mine']??'')==='1')>Somente meus leads</option></select>
+<button class="crm-btn crm-btn-primary">Filtrar</button>
 </form>
-<div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm"><thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left">Lead</th><th class="px-5 py-3 text-left">Etapa</th><th class="px-5 py-3 text-left">Origem</th><th class="px-5 py-3 text-left">Responsável</th><th class="px-5 py-3 text-right">Valor</th></tr></thead><tbody class="divide-y">@forelse($leads as $lead)<tr class="hover:bg-gray-50"><td class="px-5 py-4"><a href="{{ route('leads.show',$lead) }}" class="font-medium text-indigo-700">{{ $lead->is_favorite ? '★ ' : '' }}{{ $lead->name }}</a><p class="text-xs text-gray-500">{{ $lead->email ?: $lead->phone }}</p></td><td class="px-5 py-4">{{ $lead->stage?->name ?? 'Sem etapa' }}</td><td class="px-5 py-4">{{ $lead->source ?: '—' }}</td><td class="px-5 py-4">{{ $lead->owner?->name ?? 'Não atribuído' }}</td><td class="px-5 py-4 text-right font-medium">R$ {{ number_format((float)$lead->value,2,',','.') }}</td></tr>@empty<tr><td colspan="5" class="p-8 text-center text-gray-500">Nenhum lead encontrado.</td></tr>@endforelse</tbody></table></div></div>
-{{ $leads->links() }}
+<div class="crm-card overflow-hidden"><div class="crm-table-wrap"><table class="crm-table"><thead><tr><th>Lead</th><th>Etapa</th><th>Responsável</th><th>Origem</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>
+@forelse($leads as $lead)<tr><td><div class="flex items-center gap-3"><div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-xs font-black text-violet-300">{{ mb_strtoupper(mb_substr($lead->name,0,1)) }}</div><div><div class="font-bold">{{ $lead->name }} @if($lead->is_favorite)<span class="text-amber-400">★</span>@endif</div><div class="crm-muted text-[11px]">{{ $lead->email ?: ($lead->phone ?: 'Sem contato') }}</div></div></div></td><td>{{ $lead->stage?->name ?? 'Sem etapa' }}</td><td>{{ $lead->owner?->name ?? 'Não atribuído' }}</td><td>{{ $lead->source ?? '—' }}</td><td class="font-bold">R$ {{ number_format((float)$lead->value,2,',','.') }}</td><td><span class="crm-badge"><span class="crm-dot"></span>{{ ucfirst($lead->status) }}</span></td><td><a href="{{ route('crm.leads.show',$lead) }}" class="crm-btn">Ver</a></td></tr>@empty<tr><td colspan="7"><div class="crm-empty">Nenhum lead encontrado.</div></td></tr>@endforelse
+</tbody></table></div></div>
+<div>{{ $leads->links() }}</div>
 </div></div>
-</x-app-layout>
+@endsection

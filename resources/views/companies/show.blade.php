@@ -1,6 +1,9 @@
 @extends('layouts.smartbiz')
 
 @section('content')
+<div class="d-flex justify-content-end mb-3">
+    <x-smart.button :href="route('companies.workspace', $company)">Abrir workspace</x-smart.button>
+</div>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>

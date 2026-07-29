@@ -29,6 +29,13 @@ class PlatformContext
         $this->user = $user;
         $this->company = $company;
 
+        if ($user->isInternalSmartBizUser()) {
+            $this->roles = collect([$user->role]);
+            $this->permissions = $this->loadSystemRolePermissions($user);
+
+            return;
+        }
+
         if ($company === null) {
             $this->roles = collect();
             $this->permissions = collect();
@@ -250,4 +257,20 @@ class PlatformContext
             ->unique()
             ->values();
     }
+    private function loadSystemRolePermissions(User $user): Collection
+    {
+        return DB::table('roles')
+            ->join('role_permissions', 'role_permissions.role_id', '=', 'roles.id')
+            ->join('permissions', 'permissions.id', '=', 'role_permissions.permission_id')
+            ->whereNull('roles.company_id')
+            ->where('roles.slug', $user->role)
+            ->where('roles.status', 'active')
+            ->where('permissions.status', 'active')
+            ->whereNull('roles.deleted_at')
+            ->whereNull('permissions.deleted_at')
+            ->pluck('permissions.slug')
+            ->unique()
+            ->values();
+    }
+
 }

@@ -11,4 +11,3 @@ class UpdateLeadRequest extends StoreLeadRequest
         return $rules;
     }
 }
-

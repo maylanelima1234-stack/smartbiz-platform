@@ -20,18 +20,20 @@ class Lead extends Model
     protected $fillable = [
         'public_id', 'company_id', 'pipeline_id', 'stage_id', 'owner_id',
         'name', 'email', 'phone', 'source', 'campaign', 'status', 'priority',
-        'score', 'is_favorite', 'value', 'notes', 'last_contact_at',
-        'next_follow_up_at', 'won_at', 'lost_at',
+        'score', 'health_score', 'health_status', 'is_favorite', 'value', 'notes', 'last_contact_at',
+        'next_follow_up_at', 'stage_entered_at', 'won_at', 'lost_at',
     ];
 
     protected function casts(): array
     {
         return [
             'score' => 'integer',
+            'health_score' => 'integer',
             'is_favorite' => 'boolean',
             'value' => 'decimal:2',
             'last_contact_at' => 'datetime',
             'next_follow_up_at' => 'datetime',
+            'stage_entered_at' => 'datetime',
             'won_at' => 'datetime',
             'lost_at' => 'datetime',
         ];
@@ -43,6 +45,8 @@ class Lead extends Model
     public function owner(): BelongsTo { return $this->belongsTo(User::class, 'owner_id'); }
     public function activities(): HasMany { return $this->hasMany(CrmActivity::class)->latest(); }
     public function comments(): HasMany { return $this->hasMany(CrmComment::class)->latest(); }
+    public function timelineEvents(): HasMany { return $this->hasMany(CrmTimelineEvent::class)->latest(); }
+    public function files(): HasMany { return $this->hasMany(CrmLeadFile::class)->latest(); }
 
     public function tags(): BelongsToMany
     {

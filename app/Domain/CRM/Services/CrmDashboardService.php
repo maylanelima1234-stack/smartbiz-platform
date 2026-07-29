@@ -28,6 +28,9 @@ class CrmDashboardService
 
         return [
             'total' => $total,
+            'today' => (clone $base)->whereDate('created_at', today())->count(),
+            'week' => (clone $base)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'month' => (clone $base)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count(),
             'open' => $open,
             'won' => $won,
             'lost' => $lost,
@@ -39,7 +42,47 @@ class CrmDashboardService
             'recent_leads' => $this->recentLeads(),
             'source_stats' => $this->sourceStats(),
             'seller_ranking' => $this->sellerRanking(),
+            'attention_items' => $this->attentionItems(),
+            'due_today_count' => CrmActivity::query()->where('company_id', $companyId)->whereNull('completed_at')->whereDate('due_at', today())->count(),
+            'stalled_count' => (clone $base)->where('status', 'open')->where('updated_at', '<', now()->subDays(3))->count(),
         ];
+    }
+
+    private function attentionItems(): Collection
+    {
+        $companyId = $this->context->companyId();
+
+        $overdue = CrmActivity::query()
+            ->where('company_id', $companyId)
+            ->whereNull('completed_at')
+            ->where('due_at', '<', now())
+            ->with('lead')
+            ->orderBy('due_at')
+            ->limit(4)
+            ->get()
+            ->map(fn (CrmActivity $activity) => [
+                'type' => 'overdue',
+                'title' => $activity->title,
+                'detail' => ($activity->lead?->name ?? 'Lead removido').' · vencida em '.optional($activity->due_at)->format('d/m H:i'),
+                'url' => $activity->lead ? route('crm.leads.show', $activity->lead) : route('crm.agenda', ['period' => 'overdue']),
+            ]);
+
+        $stalled = Lead::query()
+            ->where('company_id', $companyId)
+            ->where('status', 'open')
+            ->where('updated_at', '<', now()->subDays(3))
+            ->with(['stage', 'owner'])
+            ->oldest('updated_at')
+            ->limit(4)
+            ->get()
+            ->map(fn (Lead $lead) => [
+                'type' => 'stalled',
+                'title' => $lead->name,
+                'detail' => 'Sem atualização há '.$lead->updated_at->diffInDays(now()).' dias · '.($lead->stage?->name ?? 'Sem etapa'),
+                'url' => route('crm.leads.show', $lead),
+            ]);
+
+        return $overdue->concat($stalled)->take(6)->values();
     }
 
     private function recentLeads(): Collection

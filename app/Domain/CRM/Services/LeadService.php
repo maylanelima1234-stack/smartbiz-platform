@@ -3,6 +3,7 @@
 namespace App\Domain\CRM\Services;
 
 use App\Core\Audit\Facades\SmartAudit;
+use App\Core\Automation\WorkflowEngine;
 use App\Core\Context\PlatformContext;
 use App\Domain\CRM\Models\CrmStage;
 use App\Domain\CRM\Models\Lead;
@@ -11,7 +12,13 @@ use Illuminate\Support\Str;
 
 class LeadService
 {
-    public function __construct(private readonly PlatformContext $context) {}
+    public function __construct(
+        private readonly PlatformContext $context,
+        private readonly ActivityService $activities,
+        private readonly TimelineService $timeline,
+        private readonly LeadHealthService $health,
+        private readonly WorkflowEngine $workflows,
+    ) {}
 
     public function paginate(array $filters = []): LengthAwarePaginator
     {
@@ -39,6 +46,10 @@ class LeadService
         $lead = Lead::query()->create($data);
 
         SmartAudit::log('crm.lead.created', $lead, [], $lead->getAttributes());
+        $this->activities->system($lead, 'Lead criado', 'O lead foi cadastrado no CRM.');
+        $this->timeline->record($lead, 'lead_created', 'Lead criado', 'O lead foi cadastrado no CRM.');
+        $this->health->refresh($lead);
+        $this->workflows->dispatch('lead.created', $lead);
 
         return $lead->load(['stage', 'owner']);
     }
@@ -49,7 +60,13 @@ class LeadService
         $before = $lead->getOriginal();
         $lead->update($data);
 
-        SmartAudit::log('crm.lead.updated', $lead, $before, $lead->getChanges());
+        $changes = $lead->getChanges();
+        SmartAudit::log('crm.lead.updated', $lead, $before, $changes);
+        $description = $this->describeChanges($before, $changes);
+        $this->activities->system($lead, 'Lead atualizado', $description, ['changes' => array_keys($changes)]);
+        $this->timeline->record($lead, 'lead_updated', 'Lead atualizado', $description, ['changes' => array_keys($changes)]);
+        $this->health->refresh($lead);
+        $this->workflows->dispatch('lead.updated', $lead, ['changes' => array_keys($changes)]);
 
         return $lead->fresh(['stage', 'owner']);
     }
@@ -66,6 +83,7 @@ class LeadService
         $before = ['stage_id' => $lead->stage_id, 'status' => $lead->status];
 
         $lead->stage_id = $stage->getKey();
+        $lead->stage_entered_at = now();
         $lead->pipeline_id = $stage->pipeline_id;
 
         if ($stage->is_won) {
@@ -82,12 +100,24 @@ class LeadService
 
         $lead->save();
 
+        $fromStage = CrmStage::query()->find($before['stage_id']);
+
         SmartAudit::log(
             'crm.lead.moved',
             $lead,
             $before,
             ['stage_id' => $lead->stage_id, 'status' => $lead->status]
         );
+
+        $this->activities->system(
+            $lead,
+            'Etapa alterada',
+            sprintf('%s → %s', $fromStage?->name ?? 'Sem etapa', $stage->name),
+            ['from_stage_id' => $before['stage_id'], 'to_stage_id' => $stage->getKey()]
+        );
+        $this->timeline->record($lead, 'stage_changed', 'Etapa alterada', sprintf('%s → %s', $fromStage?->name ?? 'Sem etapa', $stage->name));
+        $this->health->refresh($lead);
+        $this->workflows->dispatch('lead.moved', $lead, ['from_stage_id' => $before['stage_id'], 'to_stage_id' => $stage->getKey()]);
 
         return $lead->fresh(['stage', 'owner']);
     }
@@ -96,6 +126,22 @@ class LeadService
     {
         $this->ensureCompany($lead);
         $lead->delete();
+    }
+
+    private function describeChanges(array $before, array $changes): string
+    {
+        $labels = [
+            'owner_id' => 'responsável', 'stage_id' => 'etapa', 'status' => 'status',
+            'priority' => 'prioridade', 'value' => 'valor', 'next_follow_up_at' => 'follow-up',
+            'phone' => 'telefone', 'email' => 'e-mail', 'notes' => 'observações',
+        ];
+
+        $changed = collect(array_keys($changes))
+            ->reject(fn (string $field) => in_array($field, ['updated_at'], true))
+            ->map(fn (string $field) => $labels[$field] ?? $field)
+            ->values();
+
+        return $changed->isEmpty() ? 'Dados do lead atualizados.' : 'Campos alterados: '.$changed->implode(', ').'.';
     }
 
     private function ensureCompany(Lead $lead): void
