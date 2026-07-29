@@ -23,8 +23,8 @@ Este diretório contém as decisões arquiteturais da SmartBiz Enterprise.
 | Número | Decisão | Status |
 |---|---|---|
 | 0001 | Plataforma multi-interface e API-first | Proposto |
-| 0002 | Monólito modular | Planejado |
-| 0003 | Estrutura orientada por domínio | Planejado |
+| 0002 | Monólito modular | Proposto |
+| 0003 | Estrutura orientada ao domínio | Proposto |
 | 0004 | Estratégia de autorização RBAC | Planejado |
 | 0005 | Contexto multiempresa | Planejado |
 | 0006 | Camada de aplicação e transações | Planejado |
