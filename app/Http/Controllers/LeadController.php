@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\CRM\Models\CrmPipeline;
+use App\Domain\CRM\Models\CrmStage;
+use App\Domain\CRM\Models\Lead;
 use App\Models\Company;
-use App\Models\CrmPipeline;
-use App\Models\CrmStage;
-use App\Models\Lead;
 use App\Models\SmartNotification;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -64,11 +64,11 @@ class LeadController extends Controller
             'Novo lead cadastrado',
             $lead->name . ' foi adicionado ao CRM.',
             'lead',
-            route('leads.show', $lead),
+            route('crm.leads.show', $lead),
             'L'
         );
 
-        return redirect()->route('leads.index')->with('success','Lead cadastrado com sucesso!');
+        return redirect()->route('crm.leads.index')->with('success','Lead cadastrado com sucesso!');
     }
 
     public function show(Lead $lead)
@@ -108,12 +108,12 @@ class LeadController extends Controller
 
         $lead->update($data);
 
-        return redirect()->route('leads.index')->with('success','Lead atualizado com sucesso!');
+        return redirect()->route('crm.leads.index')->with('success','Lead atualizado com sucesso!');
     }
 
     public function destroy(Lead $lead)
     {
         $lead->delete();
-        return redirect()->route('leads.index')->with('success','Lead removido com sucesso!');
+        return redirect()->route('crm.leads.index')->with('success','Lead removido com sucesso!');
     }
 }

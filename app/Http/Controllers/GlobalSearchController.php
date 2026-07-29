@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Models\Lead;
+use App\Domain\CRM\Models\Lead;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,7 +64,7 @@ class GlobalSearchController extends Controller
                     'label' => $lead->name,
                     'description' => $companyName ?: ($lead->email ?: 'Lead do CRM'),
                     'initial' => 'L',
-                    'url' => route('leads.show', $lead),
+                    'url' => route('crm.leads.show', $lead),
                 ]);
             });
 

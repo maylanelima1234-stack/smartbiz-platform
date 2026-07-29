@@ -6,13 +6,13 @@
         <h1 class="fw-bold">Leads</h1>
         <p class="text-muted-sb">Gerencie os contatos e oportunidades comerciais.</p>
     </div>
-    <a href="{{ route('leads.create') }}" class="btn btn-primary">+ Novo Lead</a>
+    <a href="{{ route('crm.leads.create') }}" class="btn btn-primary">+ Novo Lead</a>
 </div>
 
 @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
 
 <div class="sb-card mb-4">
-    <form method="GET" action="{{ route('leads.index') }}" class="row g-3 align-items-end">
+    <form method="GET" action="{{ route('crm.leads.index') }}" class="row g-3 align-items-end">
         <div class="col-md-10"><label class="form-label">Pesquisar</label><input type="text" name="search" value="{{ $search ?? '' }}" class="form-control" placeholder="Nome, email ou telefone..."></div>
         <div class="col-md-2"><button class="btn btn-primary w-100">Buscar</button></div>
     </form>
@@ -28,11 +28,11 @@
                     <td>{{ $lead->company->name ?? '-' }}</td>
                     <td>{{ $lead->stage->name ?? '-' }}</td>
                     <td>{{ $lead->assignedUser->name ?? '-' }}</td>
-                    <td>R$ {{ number_format($lead->value,2,',','.') }}</td>
+                    <td><x-smart.money :value="$lead->value" /></td>
                     <td>
-                        <a href="{{ route('leads.show', $lead) }}" class="btn btn-sm btn-outline-info">Ver</a>
-                        <a href="{{ route('leads.edit', $lead) }}" class="btn btn-sm btn-outline-light">Editar</a>
-                        <form action="{{ route('leads.destroy', $lead) }}" method="POST" class="d-inline" onsubmit="return confirm('Remover este lead?')">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger">Excluir</button></form>
+                        <a href="{{ route('crm.leads.show', $lead) }}" class="btn btn-sm btn-outline-info">Ver</a>
+                        <a href="{{ route('crm.leads.edit', $lead) }}" class="btn btn-sm btn-outline-light">Editar</a>
+                        <form action="{{ route('crm.leads.destroy', $lead) }}" method="POST" class="d-inline" onsubmit="return confirm('Remover este lead?')">@csrf @method('DELETE')<button class="btn btn-sm btn-outline-danger">Excluir</button></form>
                     </td>
                 </tr>
             @empty

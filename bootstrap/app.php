@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\RequirePermission;
+use App\Http\Middleware\SetPlatformContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,10 +14,29 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+
+        /*
+        |--------------------------------------------------------------------------
+        | Smart Platform Middleware
+        |--------------------------------------------------------------------------
+        |
+        | Carrega automaticamente o Platform Context em todas as requisições
+        | do grupo "web".
+        |
+        */
+
+        $middleware->web(append: [
+            SetPlatformContext::class,
+        ]);
+
+        $middleware->alias([
+            'permission' => RequirePermission::class,
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
-    })->create();
+    })
+    ->create();

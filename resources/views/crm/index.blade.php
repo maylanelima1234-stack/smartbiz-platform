@@ -6,7 +6,7 @@
         <h1 class="fw-bold">CRM</h1>
         <p class="text-muted-sb">Pipeline comercial da SmartBiz.</p>
     </div>
-    <a href="{{ route('leads.create') }}" class="btn btn-primary">+ Novo Lead</a>
+    <a href="{{ route('crm.leads.create') }}" class="btn btn-primary">+ Novo Lead</a>
 </div>
 
 <div class="row g-4 mb-4">
@@ -24,10 +24,10 @@
                 <div class="sb-card h-100">
                     <h6 class="fw-bold mb-3">{{ $stage->name }}</h6>
                     @forelse($stage->leads as $lead)
-                        <a href="{{ route('leads.show', $lead) }}" class="d-block text-decoration-none text-white mb-3 p-3 rounded-3" style="background:#12071C;border:1px solid rgba(255,255,255,.08);">
+                        <a href="{{ route('crm.leads.show', $lead) }}" class="d-block text-decoration-none text-white mb-3 p-3 rounded-3" style="background:#12071C;border:1px solid rgba(255,255,255,.08);">
                             <strong>{{ $lead->name }}</strong><br>
                             <small class="text-muted-sb">{{ $lead->company->name ?? 'Sem empresa' }}</small><br>
-                            <small class="text-success">R$ {{ number_format($lead->value,2,',','.') }}</small>
+                            <small class="text-success"><x-smart.money :value="$lead->value" /></small>
                         </a>
                     @empty
                         <p class="text-muted-sb small mb-0">Sem leads nesta etapa.</p>
